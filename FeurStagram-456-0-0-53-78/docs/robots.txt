@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://krishna000627-pixel.github.io/FeurStagram/sitemap.xml

@@ -1,0 +1,49 @@
+name: Build patch bundle (.mpp)
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+  packages: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Build bundle
+        env:
+          GITHUB_ACTOR: ${{ github.actor }}
+          # The patcher dependency is on GitHub Packages. If the default token is
+          # refused, add a repo secret GPR_TOKEN (a PAT with read:packages).
+          GITHUB_TOKEN: ${{ secrets.GPR_TOKEN || secrets.GITHUB_TOKEN }}
+        run: |
+          chmod +x gradlew
+          ./gradlew :patches:build --no-daemon
+
+      - name: Find the .mpp
+        id: mpp
+        run: |
+          f=$(ls -t patches/build/libs/patches-*[0-9].mpp | grep -v -- '-sources\|-javadoc' | head -1)
+          echo "Bundle: $f"
+          echo "path=$f" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: feurstagram-mpp
+          path: ${{ steps.mpp.outputs.path }}
+
+      - name: Attach to release (tag builds only)
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "${{ github.ref_name }}" "${{ steps.mpp.outputs.path }}" --title "${{ github.ref_name }}" --generate-notes

@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security policy
+    url: https://github.com/krishna000627-pixel/Feurstagram/blob/main/SECURITY.md
+    about: Read how to report sensitive security issues.
