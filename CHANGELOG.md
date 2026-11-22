@@ -1,0 +1,549 @@
+# Changelog
+
+All notable changes to Feurstagram should be documented in this file.
+
+## Unreleased
+
+Nothing yet.
+
+## v456-0-0-53-78
+
+### Added
+
+- **Unlock timer** (Content → Unlock timer, off by default). A daily or weekly allowance
+  (1h, 2h, 5h, 8h, 12h, 24h or custom) during which the blocked surfaces picked for it work
+  again. `Timer` keeps the state in preferences on the wall clock (idle, running, paused,
+  skipped; time used; run start; period), refilled at midnight or on Monday once no session
+  runs. `Config`'s surface getters return the stored block unless a running session unlocks
+  that surface (and its Home, Search or Reels icon); the settings read the stored value. Every
+  transition (start, pause, resume, skip, end of allowance, including one that happened while
+  the app was closed) clears the cache and restarts. `TimerPill` adds a pill to each Instagram
+  activity's window while a session exists: under the status bar at first (Android gives
+  touches on the bar to the system), draggable anywhere with momentum, position kept; a tap
+  grows it into a card with Pause/Resume and Skip (confirmed). Under the permanent lock the
+  timer can only be narrowed (fewer surfaces, less time, weekly instead of daily, off).
+  Tested on device: start, pause, resume, skip, expiry, lock rules, position after restart;
+  dragging 1 janky frame of 290 (p90 12 ms).
+
+- **Block telemetry** (Settings → Privacy, on by default, and on after an update since the key
+  was never stored). `Block.onRequest` cancels, with an IOException at the Tigon request hook,
+  the uploads of usage analytics: Pigeon/Falco batches (`/pigeon_nest`,
+  `/logging_client_events`), `/launcher/mobileconfiglogging/`, `/news/log/` and the in-app
+  browser's `/fbevents.js`. Sign-in, two-factor, integrity and security checks, configuration,
+  uploads, messages and content are untouched; read receipts and story views belong to ghost
+  mode. Independent of Ads, and excluded from the permanent lock so it stays reversible.
+  Measured over every Ads × Telemetry pairing: sponsored reels and sent uploads each follow only
+  their own switch, with no failed response.
+- **Ghost mode** (Settings → Privacy, three options, all off by default, outside the lock), after
+  piko: *Hide DM read receipts* (the static method queueing the `mark_thread_seen-` mutation
+  returns at once; the chat stays unread locally too, and a reply sends no receipt), *Hide typing
+  indicator* (the composer's `onTextChanged`, found by its 0x800033/0x800013 input flags, returns
+  once the text is recorded) and *Hide story views* (`/api/v2/media/seen/?reel=…` cancelled).
+  Tested with two accounts; typing checked with JDI on the typing emitter (0/6 calls with the
+  option, 6/6 without).
+- **Grayscale** (Display, off by default): every window of the app gets a hardware layer whose
+  paint holds a zero-saturation colour matrix (windows caught through WindowManagerGlobal's root
+  views). The video player is sent down its own `getEnforceTextureView` path while it is on, so
+  Reels, feed and story videos are filtered too. Display only: saved and shared files keep their
+  colours. Not covered: the story camera preview and live video (system-composited SurfaceView).
+  Frame time over six Reels swipes: p50 5 → 7 ms, p90 10 → 15 ms, janky 3.8 % → 4.1 %.
+- **Comments** (Blocked surfaces, off by default, lockable), after piko's Disable comments:
+  post action-bar state built with comments disabled and no count; reel comment state swapped for
+  Instagram's static hidden instance; story reply-bar flags and `story_comments` emptied; the
+  story viewer's comment button and the single-reel "Add a comment…" bar hidden; comment-list
+  requests cancelled. Measured: every comment control gone with the switch on, all back with it
+  off.
+
+### Fixed
+
+- **"Feurstagram settings unavailable here".** The settings dialog was built on whatever context
+  the tapped view held; views Instagram pre-inflates, or keeps across an Activity re-creation,
+  are not on a live Activity, so `dialog.show()` threw BadTokenException. `Activities` finds the
+  view's owner by window token among the live Activities (latest resumed as a fallback),
+  `Settings.show()` waits a few frames for the window instead of failing and ignores taps while
+  open, and the Home long-press is put back on every layout pass. Reproduced with the old code
+  (`SETTINGS --ez detached true`), fixed with the new one; checked on cold start, return to the
+  foreground, account switch, tab changes, Quoicouview, Home hidden, rapid taps and Back.
+- **Ads in Reels and Stories** (#177, #178, #181, #185). Reels ads come from
+  `/api/v1/ads/async_ads/` in `ad_media_items`, a field the response filter did not empty; story
+  ads from `/feed/injected_reels_media`, which was only filtered under the Reels toggle. Reels
+  allowed: 9 of 30 sponsored with Ads off, 0 of 40 with Ads on.
+- **Every story "unavailable" with the story tray hidden** (#180): the tray-entry hook sits on the
+  parser of every story model and returned null for all of them when Stories were blocked.
+- **"Share externally" doing nothing** (#182): the signature bypass trusted every key, so
+  Instagram's third-party intent scope removed the Android share sheet as a "Meta app". Both
+  trust checks now add only the app's own signing key; deep links still resolve.
+- **Shared reel failing on the first tap with Reels blocked** (#184): after a cache wipe the
+  emptied chaining stream could land before the opened reel's own `/clips/items/` request; it now
+  waits for it (2.5 s at most). 2/2 failures before, 0/3 after; the reels after it stay blocked.
+
+### Changed
+
+- Updated to Instagram 456.0.0.53.78: the inbox refresh action moved into a static helper of
+  `onCreateView`, and the camera-panel update was inlined back into `onTabChanged` with the Home
+  tab loaded long before its check; Quoicouview mode follows both.
+- Debug bridge: `CAPTURE --es path <fragment> [--ei count n]` saves responses to the app cache;
+  `SETTINGS --ez detached true` opens the settings from a detached view.
+
+## v456-0-0-24-78
+
+### Added
+
+- **Settings button in the profile header.** A Feurstagram icon (the diamond mark, drawn in code
+  as a 24-unit line icon) sits in the header of the signed-in user's own profile, just before the
+  ☰ menu, and opens the settings on a tap. `ProfileSettingsButton` keeps it there with a window
+  layout listener that re-adds it when Instagram rebuilds the header. The own profile is told from
+  anyone else's by `profile_header_create_button`; the button is recognised by class (never by
+  tag), takes the menu button's measured size (a plain `View` asked to wrap its content takes all
+  the room) and its tint (`imageTintList`). An icon at the end of the bottom bar was tried first
+  and judged too intrusive (community poll). The long-press on the first tab is unchanged.
+- **Update dot.** The latest release found newer than the running one is stored
+  (`latest_known_release`) and drawn as a red dot on that button, across launches and without a
+  network call. The settings overview then starts with an "Update available" row that opens the
+  update page. The dot clears itself once that release is installed.
+- **Threads button hidden** (`block_threads`, on by default, under Blocked surfaces): the button of
+  the profile header's right-hand group whose accessibility label names Threads (a brand name,
+  left untranslated) is set `GONE`, and shown again when the toggle is turned off.
+
+### Changed
+
+- **"Update available" at most once a day.** The automatic check still runs at every launch
+  (it feeds the dot), but the full-screen page only comes up once per local calendar day
+  (`update_prompt_day`). Manual checks are never throttled.
+- **Official-account card on fresh installs only.** It is now shown only when
+  `firstInstallTime == lastUpdateTime` (a package that was never updated), instead of after
+  every update for anyone who never pressed Follow in the card itself.
+- Updated to Instagram 456.0.0.24.78. Instagram 456 moves many string literals into shared
+  `static String A00(int)` switch tables: the story-tray serializer is now found by its
+  `reel_type` literal plus shape; the Notes tray patch accepts the inbox-mode read compiled
+  through a static `(Lazy)Z` helper; the story-tray launch parameters gained a tenth argument.
+
+### Fixed
+
+- **Mutual followers.** `/discover/surface_with_su/` is no longer filtered by *Suggested
+  accounts*: the response carries both a profile's mutual followers and suggestions, and on an
+  empty suggestion list Instagram's "Mutual" tab skips loading its rows, so it stayed on
+  placeholders. The suggestions of that follower-list screen ("For you") are now shown.
+- **Swiping onto a hidden tab.** On Instagram 456 the tab bar is replaced by a new instance
+  after the first layout, and the new tab is marked selected after the pager's last scroll
+  callback, so a swipe could land on the hidden Reels page. The skipper now reads the live bar
+  on every check and checks once more when scrolling has gone quiet.
+
+## v455-0-0-51-72-1
+
+### Fixed
+- **Content blocks preserve native requests.** Feed, stories, Explore, Reels, ad and
+  recommendation requests run through Instagram's own transport. Successful delivery
+  JSON is filtered incrementally after reception instead of throwing an IOException
+  before sending. Empty-surface pagination is disabled locally to prevent reload
+  loops. HTTP errors and security/account notices keep their native payloads.
+- Both Reels delivery lists (`items` and `items_with_ads`) and streamed JSON documents
+  are filtered. Home-feed and story-tray parse hooks also honour the surface block.
+- The updater and What's new recognise this revision without changing Instagram's
+  package version metadata. Existing builds detect the numeric revision, while this
+  build does not repeatedly prompt to install itself. Future Instagram bases keep
+  their original identity until they receive a revision of their own.
+
+### Changed
+- Logging, seen events, uploads, statistics, privacy/security notices and commerce
+  requests are no longer cancelled. This restores native telemetry and consumes API
+  bandwidth even when content is hidden; it does not simulate views or guarantee
+  protection from account restrictions. Documentation reflects this change.
+- The Following-only request header is applied only when the home feed is visible.
+- Debug builds expose aggregate completed-response counts through `NETSTATS`.
+- Instagram base remains **455.0.0.51.72**.
+
+## v455-0-0-51-72
+
+### Fixed
+- **Stories and Notes on account-dependent inbox layouts** (#169, #165, #144).
+  When Quoicouview or the Notes block needs list-adapter hooks, select Instagram's
+  view-based inbox consistently in both rendering and data delivery. The fully
+  Compose inbox bypasses that adapter entirely. List hooks now also follow the
+  adapter's convenience wrapper to the common update method, covering updates
+  that carry a completion callback. Notes are removed as rows and stories are
+  inserted only in the inbox.
+- **Quoicouview story updates** (#162). Forward the inbox and story viewer lifecycle
+  to the tray's data controller as well as its visual controller. Returning to
+  Messages runs Instagram's native client-side story sort without its background
+  time throttle. Pull-to-refresh in Messages also requests the native stories
+  tray, independently of the blocked home timeline.
+- **Post caption preservation** (#161). Both caption input renderers save edits
+  synchronously through Instagram's existing draft setter before dispatching the
+  asynchronous edit event. Opening music or story options no longer relies on asynchronous caption
+  delivery to update the current draft. Clearing a caption still
+  saves an empty string; no cross-post caption cache is introduced.
+- **Official account prompt** (#167). Clicking Follow commits a separate local
+  preference before opening the profile. Future launches and in-place updates
+  skip the prompt after that click, independently of the package update time.
+
+### Changed
+- Updated the Instagram base to **455.0.0.51.72**. Story launch parameters now allow
+  the added list argument; camera access follows the panel updater that Instagram
+  moved out of the tab-change handler.
+- Debug UI inspection and clicks can target the focused activity/dialog window,
+  including the post editor and music browser. Click targets accept a parent
+  offset for controls without their own resource identifier.
+
+## v454-0-0-54-77
+
+### Added
+- **Permanent lock covers "Following feed only"** (#150). `limit_following_feed`
+  is lockable, with the polarity of a `block_*` key (true keeps the ranked feed
+  away) and a place in the session baseline: once on and baked in by Done, it can
+  no longer be turned off without reinstalling. Turning it on stays possible
+  under the lock.
+
+### Fixed
+- **Quoicouview: no more stuck red bubble under the heart.** Instagram's bubble
+  (`ToastingBadge`'s tooltip, "2 new followers") closes when the feed pauses; the feed
+  stays alive off screen in this mode, so the bubble stayed up, misplaced, after the
+  notifications were read. `Quoicouview.adoptHeart` now calls `setShouldToast(false)`
+  between removing the button and adding it, since the flag is read when it attaches.
+  The unread dot stays, and nothing changes outside the mode.
+- **Stories tray missing in Quoicouview mode** (#156). Three separate causes:
+  - Instagram has three main layouts, picked per account and sometimes per launch:
+    the one the mode was built on (tab pager, Messages tab), an older one (no
+    Messages tab, no pager, the feed shown with no Home icon), and "homecoming"
+    (`feed_switcher` tab, whose Home page holds no tray). All three read the same
+    developer override first, `(UserSession)` → navigation variant enum, so the
+    *Quoicouview mode* patch has it answer `REELS_SECOND` while the mode is on. Off,
+    the server still decides.
+  - Pager pages are built empty and load when first shown. Started anywhere but on
+    Home (a notification, a link), the feed never loaded, so there was no tray to
+    move. `IgSwipeableTabHostFragment.onCreate` reads `EAGER_FRAGMENT_LOADING`; its
+    answer now goes through `Quoicouview.loadsTabEagerly`, true for the feed's page.
+  - The inbox could resume before the feed was attached, and passing that resume to
+    the tray controller crashed the app ("Fragment MainFeedFragment not attached to
+    an activity", seen on the first launch after an update). `resumeController` now
+    checks `isAdded()`, and `resumeLateController` delivers the missed resume on a
+    later layout pass, which also restores the closing animation in these launches.
+- **Notes block on accounts with the Compose inbox** (#144). On those accounts the
+  tray is a `ComposeView` row with no resource id, so hiding `cf_hub_recycler_view`
+  did nothing. The new *Notes tray* patch takes the tray's list model from its bind
+  logger (`notes_tray_bind_`), the same model for both drawings, and
+  `Hiders.onListUpdate` drops that row from every list update while Notes are
+  blocked. The row is gone on the view-based inbox too, spacing included.
+- **Tablets and large screens** (#160). There the tabs live in a side rail,
+  `ls_nav_bar`, and `tab_bar` stays in the layout, empty: the settings gesture never
+  installed, so the settings were unreachable, and Home could not be hidden.
+  `Hiders.tabBar` now returns whichever bar holds the tabs, and the swipe skipper,
+  the navigation preview and the Quoicouview scroll check go through it. The rail's
+  `news_tab` follows the Notifications button toggle.
+
+### Changed
+- **Quoicouview: long-press Messages for the settings**, wherever the layout puts
+  that icon (on the rail, Search comes first).
+- **Instagram 454.0.0.54.77.** No fingerprint changed. This APKMirror bundle has no
+  `helium` / `executorch` / `pytorch` feature splits and packs its native libraries
+  in `assets/lib/libs.spo`, so the APK is about 160 MB instead of 420 MB.
+
+## v454-0-0-13-77
+
+### Changed
+- **Quoicouview: the search bar stays on top.** The stories row now goes right
+  after the inbox's search bar instead of first in the list. The search bar's
+  list models are obfuscated (two variants on 454), so the *Quoicouview mode*
+  patch collects every list model taken by the composables that log themselves
+  as "search_row" and replaces the extension's `Quoicouview.isSearchRow` stub
+  with an `instance-of` check for each (as a new 2-register method: the compiled
+  stub has no register to spare). `onListUpdate` inserts the stories row after
+  the first search row, or first when there is none; if no search model is found
+  at patch time the stub stays and the row stays first.
+
+### Fixed
+- **Story camera in Quoicouview mode** (#155, #157). The tray's "Your story" (+)
+  did nothing, and the swipe to the right that opens the camera from Home had no
+  equivalent on Messages. The camera is the panel left of the tab pages in the
+  swipe navigation (`SwipeNavigationContainer`); the tray controller's
+  "launchReelCamera" asks the swipe navigation controller to move to it, and the
+  container clamps every position to its enabled panels. The tab controller's tab
+  change ("MainTabControllerImpl.onTabChanged") only turns the camera panel on for
+  Home and turns it off for Direct, and its "may a swipe from the main page go on"
+  check also requires Home, so on Messages the request was clamped back to the
+  page. The *Quoicouview mode* patch now has both "is Home the current tab" checks
+  accept Direct (through a bridge added to the controller that asks it whether
+  Direct is current), and replaces `View.canScrollHorizontally` in the swipe
+  navigation's under-the-finger scroll check with
+  `Quoicouview.canScrollHorizontally`: the tab pager (and its inner list) report
+  that they cannot scroll towards the start when every tab before the current one
+  is hidden, so the container takes the swipe, as it does from Home. The tray and
+  the notes row are checked first and keep scrolling. Nothing changes with the
+  mode off.
+- **Sponsored-media filtering works on Instagram 454.** The media parser now
+  null-checks the field name and reads the next token between loading it and
+  hashing it, which tripped the "field-name load too far from hash dispatch"
+  guard. The guard now allows a few instructions as long as none overwrites the
+  name register.
+
+### Changed
+- Updated to Instagram 454.0.0.13.77. The tray controller's "preloadAndLaunchViewer"
+  now builds the viewer's launch parameters in a private helper, so the
+  *Quoicouview mode* patch also searches the controller methods it calls directly.
+  The English and French compatibility guides, their modification dates and the
+  sitemap now match this base version.
+
+## v453-0-0-57-79
+
+### Added
+- **Quoicouview mode** (experimental, off by default, `quoicouview_mode`). Messages
+  becomes the app's main page with the stories tray on top of the inbox and the
+  notifications button in the inbox header, and Home is turned off (the Home and
+  Messages toggles and the landing page are greyed out while it is on). The switch
+  is the first row of the settings overview, under "Experimental feature"; it is
+  unavailable when the permanent lock froze Messages hidden. A one-time card
+  (`quoicouview_intro_shown`) presents it after the update, with a screenshot the
+  *Quoicouview assets* patch adds to the APK's assets; it is skipped on a fresh
+  install, where the settings guide comes first.
+  The *Quoicouview mode* patch integrates it into Instagram's own code, with no
+  overlay or padding:
+  - every `IgRecyclerViewAdapter` registers one more row type, `StoriesTrayRow`
+    (made a subclass of the obfuscated item definition and view holder at patch
+    time), and the inbox's list updates get its model first. The row scrolls,
+    recycles and diffs like the inbox's other rows;
+  - the row shows the feed's own `reels_tray_container`, adopted when the row is
+    bound. The feed page stays alive off screen, so the tray keeps its live
+    content (new stories, seen rings, "Your story");
+  - stories open as they do from Home: the viewer grows out of the tapped avatar,
+    is stacked in the current tab, and shrinks back into it when Back or the
+    swipe-down closes it. The feed tray controller's two "is the feed visible"
+    checks also accept the tray in the inbox, and the controller, a lifecycle
+    listener of the feed fragment that never resumes here, gets the inbox's
+    resume and pause instead (that is where it plays the closing animation and
+    refreshes the tray). The viewer is added over the inbox rather than replacing
+    it (the navigator's other commit), so closing it does not rebuild the inbox
+    first; the controller is told the page is covered, then uncovered, as the
+    viewer comes and goes;
+  - the feed header's notifications button (`ToastingBadge`, with its unread
+    badge) moves to the inbox header's end buttons, whose width is refitted as
+    `IgdsActionBar` sizes them. Its tap opens the notifications in the Messages
+    tab. It stays hidden in Home's header when *Notifications button* is blocked.
+- **Hide the Home icon** (#127). *Navigation bar* gains a Home toggle (shown by
+  default, `nav_show_home`, frozen by the permanent lock like the other icons).
+  Long-pressing a tab is the only way into the settings, so with Home hidden the
+  gesture moves to the first icon left on the bar (`Hiders.settingsTab`), and the
+  first-run guide points there too. Home only goes once another icon of the live
+  bar is shown: hiding every icon keeps it. The swipe skipper already keeps swipes
+  and Back off the hidden feed page; on cold start a "Home feed" landing page now
+  opens the first visible tab instead (Create excluded), and the settings show it
+  as "First icon on the bar".
+
+### Changed
+- **Back history skips a hidden Home.** The new *Hidden Home in Back history*
+  patch makes the tab Back handling ("NavigationController.onBackPress") count the
+  tab history without hidden-feed entries. With Home hidden (or in Quoicouview
+  mode), Back from the first icon leaves the app instead of walking onto the
+  hidden feed.
+- **Debug builds.** `--debug` builds are now `android:debuggable`, and the debug
+  bridge gains view-tree commands (`TREE`, `CLICK`, `TOUCH`, `FIELDS`) and `INTRO`
+  to show the Quoicouview card.
+- Updated to Instagram 453.0.0.57.79. The English and French compatibility guides,
+  their modification dates and the sitemap now match this base version.
+
+### Fixed
+- **Launch cards fit short screens.** The cards sized by `Settings.boundToFrame`
+  (What's new, follow prompt, settings guide, the new Quoicouview card) measured
+  their overflow from the laid-out card, which is already capped at the screen,
+  so the buttons could be squeezed instead of the shrinkable block. The card's
+  natural height is now measured.
+- **Sponsored-media filtering works on Instagram 453.** The media parser's
+  `(parser, Z)` entry point reads and hashes each field name inline again (no
+  separate codec, carousel children parsed by recursion), so neither previous
+  fingerprint matched and the *Feed item filtering* patch failed to apply. A third
+  fingerprint matches it by its two error-report strings, signature and inline
+  `String.hashCode` dispatch; the 452 and older paths are kept.
+
+## v452-0-0-48-64
+
+### Added
+- **Docker build environment.** Build with JDK 21 and the Android SDK in a
+  container. The documented commands select Linux amd64 so Android's x86-64
+  build tools also run on Apple Silicon with container emulation enabled.
+
+### Changed
+- **Auto-updater improvements.**
+- **Material 3 Expressive switches.** Settings now use animated switches matching
+  the rest of the interface, including their selected, pressed and disabled states.
+- Updated to Instagram 452.0.0.48.64. The English and French compatibility guides
+  and their modification dates now match this base version.
+- **Settings open on an overview of sections.** The settings page used to be one long
+  list. It now opens on an overview with one row per section (Blocked surfaces,
+  Navigation bar, Feed, Landing page, Display and popups, Updates, Support), each with
+  Instagram's own outline icon and a summary of its current state. A row opens that
+  section's page in the same window, with a back arrow; Back returns to the overview.
+  Permanent lock and Done stay pinned on every page. The Navigation bar page shows a
+  live preview of the bar and greys out toggles for tabs the running Instagram build
+  does not have. No setting, key or default changed.
+
+### Fixed
+- **Settings close with an animation.** Android Back now reverses the settings
+  opening transition before closing the overview. Back from a section still
+  returns to the overview.
+- **Sponsored-media filtering works on Instagram 452.** The media parser now
+  delegates to a codec with two field-dispatch paths instead of the old static
+  dispatcher. Follow the wrapper's codec call by signature and hook field-name
+  reads in both paths, including the direct parser used for carousel children.
+  The previous parser hook remains available for older Instagram builds.
+- **Suggested accounts no longer fill the story tray.** Instagram mixes suggested
+  accounts into the home story tray as ordinary entries of the tray response (typed
+  `suggested_user`), so blocking the suggestion endpoints did not catch them: on a test
+  account, 12 of the 19 tray entries were suggestions. They are now dropped as the tray
+  is parsed when *Suggested accounts* is blocked, and come back when it is turned off.
+
+## v451-0-0-20-80
+
+### Fixed
+- **Sponsored posts are removed from the feed.** Instagram now sends its in-feed ads,
+  "Sponsored" posts and "ad break" posts alike, inside the timeline response itself,
+  wrapped in the same `media_or_ad` unit as a regular post, then injects them client-side
+  between the posts. No ad URL to block and no ad unit type to drop, so the Ads toggle
+  let them all through (about one post in two on a test account). The media parser now
+  reports each post's JSON fields, and a post carrying an ad-only field (`injected`,
+  `dr_ad_type`) is dropped before it reaches the feed. Regular posts, including paid
+  partnerships, are untouched. Gated on the Ads toggle.
+- **Network blocking applies again on Instagram 451.** Instagram 451 turned
+  `TigonServiceLayer.startRequest` into a tracing wrapper around a new
+  `startRequestInternal`, so the network hook no longer found the request URI and the patch
+  failed to apply, which would have let the feed, stories, explore, reels, ads and
+  telemetry back in. The hook now targets whichever `startRequest*` method reads the URI.
+
+### Changed
+- Updated to Instagram 451.0.0.20.80. The guides that name the Instagram version they were
+  checked against now name 451.0.0.20.80.
+
+## v450-0-0-50-77
+
+### Changed
+- **New official Instagram account.** Feurstagram moved to a new account,
+  [@feurstagram_off](https://www.instagram.com/feurstagram_off/). The card shown after an
+  install or update now introduces it as the new account, and *Follow* opens it. The card
+  runs once per update, so users who already dismissed it for the old account see it again
+  with this release.
+- The README and the website (home page, French home page, press kits, Instagram without
+  Reels pages and structured data) link to the new account.
+- Updated to Instagram 450.0.0.50.77. The guides that name the Instagram version they were
+  checked against now name 450.0.0.50.77.
+
+## v446-0-0-49-77
+
+### Added
+- **Follow the official account.** The first launch after installing or updating
+  FeurStagram shows a card inviting the user to follow
+  [@feurstagram_official](https://www.instagram.com/feurstagram_official/), where every
+  release is announced. *Follow* opens the profile inside the app, *Not now* closes it.
+  "After an install or update" is read from the package's `lastUpdateTime`, not its
+  versionName, so a re-release on the same Instagram base counts too; it is shown once per
+  install or update, and the "What's new" card only runs once it has been dismissed.
+- **Website: Instagram without Reels pages, guides and a press kit.** A landing page for
+  "Instagram without Reels" comparing the ways to hide Reels, guides (removing Reels on
+  Android, Instagram without the feed, DFInstagram alternative, Feurstagram vs ScrollGuard vs
+  WallHabit, the EU's findings on Instagram's addictive design), a press kit, a French
+  version of the main pages, structured data, `hreflang` pairs and a `sitemap.xml`.
+- The website shows the total download count, loaded from GitHub when the page opens, and
+  the official contact address, feurstagram@gmail.com.
+
+### Fixed
+- **Deep links keep working on Instagram 446.** Instagram 446 reshaped the family-app scope
+  trust check that the signature-check bypass disables: the static
+  `boolean(KeyHash, KeyHash, Z)` became an instance method taking the caller identity and
+  reading both key hashes from it. The patch failed to apply, which would have sent shared
+  posts, reels and profiles back to the home feed. It now matches either form, the new one by
+  structure alone.
+- The website's canonical and Open Graph URLs pointed at `/Feurstagram/`, which returns 404 on
+  GitHub Pages; they now use `/FeurStagram/`.
+
+### Changed
+- **The settings page opens with an animation.** Long-pressing Home now brings the
+  Feurstagram settings page in with a short rise-and-fade instead of it appearing at once.
+- Updated to Instagram 446.0.0.49.77.
+- The README's download badge shows the total number of downloads, and the README lists the
+  official contact address.
+
+## v445-0-0-45-83
+
+### Fixed
+- **Ad and "suggested" filtering in the feed works again.** The patch that drops
+  ad/promo units injected inline into the timeline stopped applying on Instagram
+  444: its fingerprint required the `in_feed_survey` unit type, which Instagram
+  removed from the feed-item parser. The patch failed silently and every inline
+  ad/netego unit came back. The fingerprint now anchors on four load-bearing
+  tokens instead of seven. Fixes #117.
+- **Hidden navigation tabs can no longer be reached by swiping.** Hiding a tab
+  only removed its icon; the page stayed in the swipe pager, so a flick still
+  opened Search, Messages or Reels — and walked straight around the permanent
+  lock. A swipe released toward a hidden tab is now re-aimed at the nearest
+  visible one, mid-flight, so it stays a single continuous gesture rather than
+  landing on the hidden page and cutting away. Always on: it is not a toggle,
+  because a switch that turns it off would be a way around the permanent lock.
+  Fixes #121 and #92.
+- **The landing page can no longer point at a hidden surface.** Search stayed
+  selectable as the cold-start page even when its tab was hidden and the
+  permanent lock was on, which handed back the surface the lock was meant to
+  remove. Options for hidden tabs are now greyed out, and an already-stored one
+  falls back to the home feed. Fixes #116.
+
+- **The updater no longer raises two install prompts.** A second Android
+  "update this app?" dialog was queued behind the first and surfaced once the
+  install had already finished, reporting a failure for an APK that was no
+  longer there. Only one confirmation is ever raised now, a second update can't
+  start while one is running, and any installer session left over from an
+  earlier attempt is abandoned first.
+
+### Added
+- **Rebuilt update flow, as full-screen pages.** "Update available" shows the
+  release's own notes (headings, bullets and all); choosing Update opens a
+  progress page with a real progress bar, transferred size, percentage and a
+  Cancel. Leaving that page does not stop the download — it carries on behind an
+  ongoing notification with the same progress and the same Cancel. Neither
+  screen is a popup any more.
+- **What's new.** The first launch after an update shows a card with that
+  version's release notes, pulled from its GitHub release. Shown once per
+  version, and not gated on the update-check toggle — that toggle is about being
+  nagged to update, not about being told what an update did.
+- **Design guidelines** written down in `docs/DESIGN.md`, so the Material 3
+  Expressive monochrome system is followed the next time the UI changes.
+- **Debug builds** (`./build.sh … --debug`): the settings become readable and
+  writable over ADB broadcasts, so on-device testing no longer needs the UI.
+  Development only, never enabled in a release.
+
+### Changed
+- **Feurstagram's own screens are redesigned in Material 3 Expressive,
+  monochrome.** No more purple: white is the only accent. Options are grouped
+  into connected lists with large outer corners, buttons are pills, section
+  labels are sentence case, and the headline is larger and tighter. Settings,
+  the update pages, the confirmations and the first-run guide all share it.
+- **Every Feurstagram screen now fits any device.** They pad themselves against
+  the system bars and the display cutout, so the action buttons are no longer
+  hidden behind a three-button navigation bar; the scrolling area shrinks to
+  what is actually on screen instead of being cropped; and the content column is
+  capped at a readable width on tablets, foldables and wide screens.
+
+### Changed
+- Updated to Instagram 445.0.0.45.83.
+- `build.sh` now reports which patches applied (`build/patch-report.json`), so a
+  fingerprint that stops matching is visible instead of silent, and it accepts
+  the renamed `morphe-desktop-*.jar` CLI.
+- The update download no longer goes through the system `DownloadManager`; it is
+  fetched in-app so its progress can be shown, cancelled, and mirrored into a
+  notification when the page is closed.
+
+## v444-0-0-46-85
+
+### Added
+- **Force dark (disable HDR)** toggle (Settings → Display, on by default): stops
+  Instagram forcing its window into HDR mode, which lifted the black floor and
+  washed out the dark UI on HDR OLED screens. Turn it off to restore Instagram's
+  HDR behaviour.
+
+### Fixed
+- **Deep links** into Instagram now open their target (shared posts, reels,
+  profiles) instead of dropping to the home feed, via a new signature-check
+  bypass that makes Instagram trust the re-signed build. Fixes #36 and #106.
+  Thanks @na-ji.
+
+### Changed
+- Updated to Instagram 444.0.0.46.85.
+
+## Previous releases
+
+See GitHub Releases for APK downloads and version-specific changes.

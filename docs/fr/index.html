@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <!-- No analytics are loaded. Keep a local no-op so existing click handlers do not fail. -->
+    <script>
+        function gtag() { }
+    </script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feurstagram : Instagram sans Reels, sans fil ni pubs (Android)</title>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description"
+        content="Feurstagram, c'est Instagram sans Reels sur Android : une appli gratuite et open source sans Reels, fil ni pubs, qui garde DM, stories et notifications.">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <link rel="canonical" href="https://krishna000627-pixel.github.io/FeurStagram/fr/">
+    <link rel="alternate" hreflang="en" href="https://krishna000627-pixel.github.io/FeurStagram/">
+    <link rel="alternate" hreflang="fr" href="https://krishna000627-pixel.github.io/FeurStagram/fr/">
+    <link rel="alternate" hreflang="x-default" href="https://krishna000627-pixel.github.io/FeurStagram/">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Feurstagram">
+    <meta property="og:url" content="https://krishna000627-pixel.github.io/FeurStagram/fr/">
+    <meta property="og:title" content="Feurstagram : Instagram sans Reels">
+    <meta property="og:description"
+        content="Plus de Reels, de fil ni de pubs. Les messages, les stories et les profils restent. Gratuit et open source pour Android.">
+    <meta property="og:image" content="https://krishna000627-pixel.github.io/FeurStagram/assets/brand/open-graph.png">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Logo FeurStagram sur fond sombre">
+    <meta property="og:locale" content="fr_FR">
+    <meta property="og:locale:alternate" content="en_US">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://krishna000627-pixel.github.io/FeurStagram/fr/">
+    <meta name="twitter:title" content="Feurstagram : Instagram sans Reels">
+    <meta name="twitter:description"
+        content="Plus de Reels, de fil ni de pubs. Les messages, les stories et les profils restent. Gratuit et open source pour Android.">
+    <meta name="twitter:image" content="https://krishna000627-pixel.github.io/FeurStagram/assets/brand/open-graph.png">
+    <meta name="twitter:image:alt" content="Logo FeurStagram sur fond sombre">
+
+    <!-- Favicon -->
+    <link rel="icon" sizes="16x16 32x32 48x48" href="../assets/brand/favicon.ico">
+    <link rel="icon" type="image/svg+xml" sizes="any" href="../assets/brand/favicon.svg">
+    <link rel="apple-touch-icon" sizes="180x180" href="../assets/brand/apple-touch-icon.png">
+
+    <script type="application/ld+json">
+    [{
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "Feurstagram",
+        "alternateName": "Instagram sans Reels",
+        "operatingSystem": "Android",
+        "applicationCategory": "LifestyleApplication",
+        "description": "Modification gratuite et open source de l'application Instagram officielle pour Android, qui retire les Reels, le fil d'actualité, Explorer, les comptes suggérés, les publicités, en gardant les messages privés, les stories, la recherche, les profils et les notifications.",
+        "license": "https://www.gnu.org/licenses/gpl-3.0.html",
+        "isAccessibleForFree": true,
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" },
+        "inLanguage": "fr",
+        "downloadUrl": "https://github.com/krishna000627-pixel/FeurStagram/releases/latest",
+        "screenshot": "https://krishna000627-pixel.github.io/FeurStagram/assets/img/after.png",
+        "author": { "@type": "Person", "name": "krishna000627-pixel", "url": "https://github.com/krishna000627-pixel" },
+        "sameAs": ["https://github.com/krishna000627-pixel/FeurStagram"]
+    }, {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Feurstagram",
+        "url": "https://krishna000627-pixel.github.io/FeurStagram/fr/",
+        "inLanguage": "fr"
+    }, {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "Feurstagram",
+        "url": "https://krishna000627-pixel.github.io/FeurStagram/fr/",
+        "logo": "https://krishna000627-pixel.github.io/FeurStagram/assets/brand/app-icon-256.png",
+        "sameAs": ["https://github.com/krishna000627-pixel/FeurStagram"]
+    }]
+    </script>
+
+    <link rel="stylesheet" href="../assets/brand/tokens.css">
+    <link rel="stylesheet" href="../assets/home.css">
+</head>
+
+<body>
+    <main>
+        <section class="hero container">
+            <h1>
+                <img class="hero-logo" src="../assets/brand/horizontal-paper.svg" width="807" height="148" alt="FeurStagram">
+                <span class="h1-sub">Instagram sans Reels</span>
+            </h1>
+            <p class="tagline">L'application Instagram pour Android sans Reels, sans fil d'actualité infini, sans Explorer ni publicités. Les messages, les stories et les profils restent.</p>
+
+            <div class="button-group">
+                <div class="download-controls">
+                    <a href="https://github.com/krishna000627-pixel/Feurstagram/releases/latest" class="btn btn-primary"
+                        id="btn-download-standard" onclick="gtag('event', 'download_apk_standard'); return true;">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 16l-6-6h4V4h4v6h4l-6 6zm-8 2h16v2H4v-2z" />
+                        </svg>
+                        <span class="btn-text">
+                            <span class="btn-main">Télécharger l'APK</span>
+                            <span class="btn-meta" id="release-info-standard">Chargement…</span>
+                        </span>
+                    </a>
+                    <a href="https://github.com/krishna000627-pixel/Feurstagram/releases/latest" class="btn btn-secondary"
+                        id="btn-download-clone" onclick="gtag('event', 'download_apk_clone'); return true;">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 16l-6-6h4V4h4v6h4l-6 6zm-8 2h16v2H4v-2z" />
+                        </svg>
+                        <span class="btn-text">
+                            <span class="btn-main">Télécharger l'APK Clone</span>
+                            <span class="btn-meta" id="release-info-clone">Chargement…</span>
+                        </span>
+                    </a>
+                </div>
+                <a href="https://github.com/krishna000627-pixel/Feurstagram" class="btn btn-secondary" id="btn-source"
+                    target="_blank" rel="noopener" onclick="gtag('event', 'view_source_code');">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                        <path
+                            d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+                    </svg>
+                    Code source
+                </a>
+            </div>
+            <p class="downloads-total" data-downloads-wrap hidden><strong data-total-downloads></strong> téléchargements</p>
+            <nav class="quick-links" aria-label="Liens du projet">
+                <a href="instagram-sans-reels/">Instagram sans Reels</a>
+                <a href="https://github.com/krishna000627-pixel/Feurstagram/releases/latest">Dernière version</a>
+                <a href="https://github.com/krishna000627-pixel/Feurstagram/blob/main/docs/INSTALL.md" hreflang="en">Guide d'installation</a>
+                <a href="https://github.com/krishna000627-pixel/Feurstagram/blob/main/docs/BUILD_FROM_SOURCE.md" hreflang="en">Compiler depuis les sources</a>
+                <a href="https://github.com/krishna000627-pixel/Feurstagram/blob/main/docs/FAQ.md" hreflang="en">FAQ</a>
+                <a href="https://github.com/krishna000627-pixel/Feurstagram/issues">Signaler un problème sur GitHub</a>
+                <a href="presse/">Kit presse</a>
+                <a href="../" hreflang="en" lang="en">English</a>
+            </nav>
+            <p class="developed-by">Modifié avec ♥ par <a href="https://github.com/krishna000627-pixel" target="_blank" rel="noopener">krishna000627-pixel</a></p>
+        </section>
+
+        <section class="features container">
+            <div class="section-header">
+                <h2>Ce qui change</h2>
+                <p>Gardez l'essentiel, supprimez ce qui distrait</p>
+            </div>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon" aria-hidden="true">×</div>
+                    <span class="status-badge blocked">Bloqué</span>
+                    <h3>Fil d'actualité</h3>
+                    <p>Le fil d'accueil sans fin est masqué après réception de sa réponse native. Fini le doomscrolling.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon" aria-hidden="true">×</div>
+                    <span class="status-badge blocked">Masqué</span>
+                    <h3>Onglet Explorer</h3>
+                    <p>Le contenu suggéré d'Explorer est masqué pour éviter de naviguer sans fin.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon" aria-hidden="true">×</div>
+                    <span class="status-badge blocked">Masqué</span>
+                    <h3>Onglet Reels</h3>
+                    <p>Les contenus Reels sont filtrés après réception et l'icône de l'onglet est retirée de la barre du bas. Plus de vidéos qui s'enchaînent à l'infini.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon" aria-hidden="true">×</div>
+                    <span class="status-badge blocked">Masqué</span>
+                    <h3>Instants (+ dans les DM)</h3>
+                    <p>L'envahissant bouton « + » des Instants, en bas à droite de la messagerie, est masqué. Réglable.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon" aria-hidden="true">×</div>
+                    <span class="status-badge blocked">Masqué</span>
+                    <h3>Notes (au-dessus des DM)</h3>
+                    <p>La rangée de bulles de Notes de vos amis, en haut de la messagerie, est masquée. Réglable.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon" aria-hidden="true">✓</div>
+                    <span class="status-badge enabled">Fonctionne</span>
+                    <h3>Stories</h3>
+                    <p>Regardez les stories des personnes que vous suivez et publiez les vôtres.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon" aria-hidden="true">✓</div>
+                    <span class="status-badge enabled">Fonctionne</span>
+                    <h3>Messages privés</h3>
+                    <p>Toute la messagerie, y compris les Reels et publications partagés.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon" aria-hidden="true">✓</div>
+                    <span class="status-badge enabled">Fonctionne</span>
+                    <h3>Profil et recherche</h3>
+                    <p>Accédez à votre profil, recherchez des comptes et recevez vos notifications.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="info-section container" aria-labelledby="unlock-timer">
+            <div class="section-header">
+                <h2 id="unlock-timer">Minuteur de déblocage</h2>
+            </div>
+            <div class="timer-feature">
+                <div>
+                    <p>Sur les versions qui incluent cette fonction, ouvrez <strong>les réglages FeurStagram → Content → Unlock timer</strong> pour réactiver temporairement certains contenus bloqués. Le temps disponible se renouvelle chaque jour ou chaque semaine.</p>
+                    <p>Démarrez une session, puis utilisez le décompte déplaçable pour la mettre en pause ou la reprendre. Les contenus sélectionnés sont à nouveau bloqués pendant la pause et à la fin du temps imparti.</p>
+                </div>
+                <a href="../assets/img/unlock-timer.png">
+                    <img src="../assets/img/unlock-timer-540.webp" width="540" height="1205" alt="Réglages Unlock timer avec le temps disponible et les contenus à débloquer" loading="lazy" decoding="async">
+                </a>
+            </div>
+        </section>
+
+        <section class="info-section container">
+            <div class="section-header">
+                <h2>Pourquoi Feurstagram ?</h2>
+                <p>Pour celles et ceux qui ont besoin des DM, des stories et des profils Instagram, mais pas des Reels, d'Explorer, des pubs ni du fil sans fin.</p>
+            </div>
+
+            <div class="info-grid">
+                <div class="feature-card">
+                    <h3>Une vraie appli Android</h3>
+                    <p>Feurstagram modifie la vraie application Instagram pour Android, au lieu d'afficher le site mobile dans une WebView.</p>
+                </div>
+
+                <div class="feature-card">
+                    <h3>Modifications publiques</h3>
+                    <p>Chaque modification est publique : vous pouvez vérifier ce qui change avant d'installer quoi que ce soit.</p>
+                </div>
+
+                <div class="feature-card">
+                    <h3>Pensé pour la concentration</h3>
+                    <p>Les fonctions sociales utiles restent, les parties conçues pour faire défiler sans fin disparaissent.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="info-section container">
+            <div class="section-header">
+                <h2>APK classique ou APK Clone ?</h2>
+                <p>Choisissez le type d'installation qui correspond à votre usage d'Instagram sur votre appareil.</p>
+            </div>
+
+            <div class="info-grid">
+                <div class="feature-card">
+                    <h3>APK classique</h3>
+                    <p>Remplace l'application Instagram habituelle en gardant son identifiant de paquet d'origine. À choisir si vous ne voulez que Feurstagram.</p>
+                </div>
+
+                <div class="feature-card">
+                    <h3>APK Clone</h3>
+                    <p>Utilise un autre identifiant de paquet et s'installe à côté de l'application Instagram officielle. À choisir si vous voulez les deux applis sur le même appareil.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="info-section container">
+            <div class="section-header">
+                <h2>Sécurité et confiance</h2>
+                <p>Feurstagram ne collecte, ne relaie, ne stocke ni ne transmet vos identifiants Instagram.</p>
+            </div>
+
+            <div class="info-grid">
+                <div class="feature-card">
+                    <h3>Compilez-le vous-même</h3>
+                    <p>Vous pouvez générer l'APK en local à partir du code source, au lieu de faire confiance à une version précompilée.</p>
+                </div>
+
+                <div class="feature-card">
+                    <h3>Projet non officiel</h3>
+                    <p>Feurstagram n'est affilié ni à Instagram ni à Meta. C'est un APK modifié : utilisez-le à vos risques et périls.</p>
+                </div>
+
+                <div class="feature-card">
+                    <h3>Fonctionnement documenté</h3>
+                    <p>Le README (en anglais) décrit le filtrage des réponses. Les requêtes natives, y compris la télémétrie Instagram, restent actives.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="info-section container" aria-labelledby="guides-title">
+            <div class="section-header">
+                <h2 id="guides-title">Guides</h2>
+                <p>Comment utiliser Instagram sans Reels, sans fil ni pubs sur Android.</p>
+            </div>
+
+            <div class="info-grid">
+                <a class="feature-card guide-card" href="instagram-sans-reels/">
+                    <h3>Instagram sans Reels</h3>
+                    <p>Instagram n'a aucun réglage pour désactiver les Reels. Cinq façons de s'en passer, comparées.</p>
+                </a>
+                <a class="feature-card guide-card" href="supprimer-les-reels-instagram-android/">
+                    <h3>Supprimer les Reels sur Android</h3>
+                    <p>Toutes les options, des réglages d'Instagram à la suppression de l'onglet Reels.</p>
+                </a>
+                <a class="feature-card guide-card" href="instagram-sans-fil-actualite/">
+                    <h3>Instagram sans fil d'actualité</h3>
+                    <p>Garder seulement les messages privés et les stories.</p>
+                </a>
+                <a class="feature-card guide-card" href="../dfinstagram-alternative/" hreflang="en">
+                    <h3>Alternative à DFInstagram</h3>
+                    <p>Un Instagram sans distractions, maintenu et open source (en anglais).</p>
+                </a>
+                <a class="feature-card guide-card" href="../feurstagram-vs-scrollguard-vs-wallhabit/" hreflang="en">
+                    <h3>Feurstagram vs ScrollGuard vs WallHabit</h3>
+                    <p>Appli modifiée ou appli de blocage : laquelle vous convient (en anglais).</p>
+                </a>
+                <a class="feature-card guide-card" href="../instagram-addictive-design-eu/" hreflang="en">
+                    <h3>Ce que l'UE a constaté</h3>
+                    <p>Le design addictif d'Instagram face au règlement sur les services numériques (en anglais).</p>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>
+            Gratuit et open source. Modifié par <a href="https://github.com/krishna000627-pixel" target="_blank"
+                rel="noopener">krishna000627-pixel</a> •
+            <a href="https://github.com/krishna000627-pixel/Feurstagram/issues" target="_blank" rel="noopener">Signaler un problème</a>
+        </p>
+        <p>
+            <a href="presse/">Kit presse</a> •
+            <a href="../" hreflang="en" lang="en">English</a>
+        </p>
+    </footer>
+
+    <script src="../assets/site.js"></script>
+    <script>
+        const FALLBACK_RELEASE_URL = 'https://github.com/krishna000627-pixel/Feurstagram/releases/latest';
+
+        let latestApkAssets = [];
+
+        function getApkAssets(assets) {
+            if (!Array.isArray(assets)) {
+                return [];
+            }
+
+            return assets.filter((asset) => {
+                if (!asset || typeof asset.name !== 'string') {
+                    return false;
+                }
+
+                const lowerName = asset.name.toLowerCase();
+                return lowerName.endsWith('.apk') || lowerName.endsWith('.apkm');
+            });
+        }
+
+        function isCloneAsset(asset) {
+            if (!asset || typeof asset.name !== 'string') {
+                return false;
+            }
+
+            return /(^|[-_.])clone([-_.]|$)/i.test(asset.name);
+        }
+
+        function updateDownloadButtons() {
+            const standardBtn = document.getElementById('btn-download-standard');
+            const cloneBtn = document.getElementById('btn-download-clone');
+            const releaseInfoStandard = document.getElementById('release-info-standard');
+            const releaseInfoClone = document.getElementById('release-info-clone');
+            if (!standardBtn || !cloneBtn) {
+                return;
+            }
+
+            const cloneAsset = latestApkAssets.find((asset) => isCloneAsset(asset));
+            const standardAsset = latestApkAssets.find((asset) => !isCloneAsset(asset)) || null;
+
+            if (standardAsset) {
+                standardBtn.href = standardAsset.browser_download_url;
+                standardBtn.classList.remove('btn-disabled');
+                standardBtn.setAttribute('aria-disabled', 'false');
+            } else {
+                standardBtn.href = FALLBACK_RELEASE_URL;
+                standardBtn.classList.remove('btn-disabled');
+                standardBtn.setAttribute('aria-disabled', 'false');
+                if (releaseInfoStandard) {
+                    releaseInfoStandard.textContent = 'Dernière version';
+                }
+            }
+
+            if (cloneAsset) {
+                cloneBtn.href = cloneAsset.browser_download_url;
+                cloneBtn.classList.remove('btn-disabled');
+                cloneBtn.setAttribute('aria-disabled', 'false');
+            } else {
+                cloneBtn.href = FALLBACK_RELEASE_URL;
+                cloneBtn.classList.remove('btn-disabled');
+                cloneBtn.setAttribute('aria-disabled', 'false');
+                if (releaseInfoClone) {
+                    releaseInfoClone.textContent = 'Voir la dernière version';
+                }
+            }
+        }
+
+        // Latest release, from the release list assets/site.js loads once per session
+        // (the same request also gives the total download count).
+        async function fetchLatestRelease() {
+            try {
+                const summary = await window.feurstagramReleases;
+                const data = summary && summary.latest;
+                if (!data) {
+                    throw new Error('No published release');
+                }
+
+                const version = data.tag;
+                const date = new Date(data.publishedAt);
+                const formattedDate = date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' });
+
+                // Update button text
+                const releaseInfoStandard = document.getElementById('release-info-standard');
+                const releaseInfoClone = document.getElementById('release-info-clone');
+                if (releaseInfoStandard) {
+                    releaseInfoStandard.textContent = `${version} • ${formattedDate}`;
+                }
+                if (releaseInfoClone) {
+                    releaseInfoClone.textContent = `${version} • Version Clone`;
+                }
+
+                // Update download link to direct APK
+                latestApkAssets = getApkAssets(data.assets.map((asset) => ({
+                    name: asset.name,
+                    browser_download_url: asset.url
+                })));
+                updateDownloadButtons();
+            } catch (error) {
+                const releaseInfoStandard = document.getElementById('release-info-standard');
+                const releaseInfoClone = document.getElementById('release-info-clone');
+                if (releaseInfoStandard) {
+                    releaseInfoStandard.textContent = 'Dernière version';
+                }
+                if (releaseInfoClone) {
+                    releaseInfoClone.textContent = 'Version Clone';
+                }
+                latestApkAssets = [];
+                updateDownloadButtons();
+            }
+        }
+
+        updateDownloadButtons();
+        fetchLatestRelease();
+    </script>
+</body>
+
+</html>
